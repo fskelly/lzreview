@@ -1,4 +1,4 @@
-# Community Based Azure Landing Zone Review\
+# Community Based Azure Landing Zone Review
 *Azure landing zones are the output of a multi subscription Azure environment that accounts for scale, security, governance, networking, and identity. Azure landing zones enable application migrations and the greenfield development at an enterprise scale in Azure. These zones consider all platform resources required to support the customer's application portfolio and don't differentiate between infrastructure as a service or platform as a service. Source [Microsoft Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/)*
 \
 \

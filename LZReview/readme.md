@@ -38,7 +38,7 @@ You should now see the Workbook with the subscription auto-populated, and a numb
 
 ![workbook view](/resources/lz-overview.jpg "lz-overview")
 
-Other tabs:
+**Other tabs**:
 * Governance:
 ![Governance](/resources/lz-governance1.jpg "governance view")
 * Identity and RBAC:

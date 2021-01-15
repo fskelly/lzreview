@@ -31,8 +31,12 @@
               "value::selected"
             ],
             "value": [
+              "/subscriptions/2a165113-1848-4c2b-9e1d-16aa48ac9765",
               "/subscriptions/5733bcb3-7fde-4caf-8629-41dc15e3b352",
-              "/subscriptions/2a165113-1848-4c2b-9e1d-16aa48ac9765"
+              "/subscriptions/5044ad67-cc18-4153-be7e-cefd01e28625",
+              "/subscriptions/81782e84-cc1b-451f-acce-9d471d2976b4",
+              "/subscriptions/3b94c331-27b6-4563-8d7d-b11c674d167c",
+              "/subscriptions/d1d8779d-38d7-4f06-91db-9cbc8de0176f"
             ],
             "typeSettings": {
               "additionalResourceOptions": [],
@@ -77,8 +81,24 @@
             "id": "eb3b5b59-7f91-4743-8b61-da82a7be1417",
             "cellValue": "selectedTab",
             "linkTarget": "parameter",
-            "linkLabel": "Governance and Security",
+            "linkLabel": "Governance",
             "subTarget": "Governance",
+            "style": "link"
+          },
+          {
+            "id": "05ad7fa2-87e1-40ec-af5b-bb154ee81196",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Security",
+            "subTarget": "Security",
+            "style": "link"
+          },
+          {
+            "id": "1cf8e128-f2cb-4315-b34a-da2efa107f95",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Monitoring",
+            "subTarget": "Monitoring",
             "style": "link"
           },
           {
@@ -150,6 +170,34 @@
             },
             "customWidth": "20",
             "name": "countofallresources"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "policyresources\r\n| where type == \"microsoft.policyinsights/policystates\"\r\n| extend AssignmentName = tostring(properties.policyAssignmentName)\r\n| summarize AssignmentCount = dcount(AssignmentName)",
+              "size": 4,
+              "title": "Count of all Policy Assignments",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {},
+                "leftContent": {
+                  "columnMatch": "AssignmentCount",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "auto"
+                  }
+                },
+                "showBorder": false
+              }
+            },
+            "customWidth": "20",
+            "name": "policycount"
           },
           {
             "type": 3,
@@ -234,34 +282,6 @@
             },
             "customWidth": "20",
             "name": "publicipaddresses"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "policyresources\r\n| where type == \"microsoft.policyinsights/policystates\"\r\n| extend AssignmentName = tostring(properties.policyAssignmentName)\r\n| summarize AssignmentCount = dcount(AssignmentName)",
-              "size": 4,
-              "title": "Count of all Policy Assignments",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "{Subscription}"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "titleContent": {},
-                "leftContent": {
-                  "columnMatch": "AssignmentCount",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "auto"
-                  }
-                },
-                "showBorder": false
-              }
-            },
-            "customWidth": "20",
-            "name": "policycount"
           }
         ]
       },
@@ -281,23 +301,16 @@
           {
             "type": 1,
             "content": {
-              "json": "# Governance and Security"
+              "json": "# Governance Overview"
             },
-            "name": "text - 0"
-          },
-          {
-            "type": 1,
-            "content": {
-              "json": "## Governance Overview"
-            },
-            "name": "text - 3"
+            "name": "Governanceheader"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
               "query": "resourcecontainers\r\n| where type == \"microsoft.resources/subscriptions\"\r\n| extend inManagementGroup = iif(isnotempty(tags), \"True\", \"False\"),\r\n\tspendingLimit = properties.subscriptionPolicies.spendingLimit,\r\n\tstate = properties.state\r\n| project id, name, type, tenantId, inManagementGroup, spendingLimit, state",
-              "size": 4,
+              "size": 0,
               "title": "Azure Subscription Status",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
@@ -406,7 +419,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "Resources\r\n| project tags\r\n| where tags != \"{}\"\r\n| where tags != \"\"\r\n| where tags notcontains \"AutomationAccountARMID\"\r\n| where tags notcontains \"hidden-link\"\r\n| where tags notcontains \"hidden-title\"\r\n| where tags notcontains \"Azure Site Recovery Service\"\r\n| where tags notcontains \"azure-cloud-shell\"\r\n| mvexpand tags\r\n| summarize Events=count() by tostring(tags)\r\n| order by Events desc",
+              "query": "Resources\r\n| project tags, subscriptionId\r\n| where tags != \"{}\"\r\n| where tags != \"\"\r\n| where tags notcontains \"AutomationAccountARMID\"\r\n| where tags notcontains \"hidden-link\"\r\n| where tags notcontains \"hidden-title\"\r\n| where tags notcontains \"Azure Site Recovery Service\"\r\n| where tags notcontains \"azure-cloud-shell\"\r\n| mvexpand tags\r\n| parse tags with * '\"' TagName '\":\"' TagValue '\"' *\r\n| summarize TagCount=count() by subscriptionId, TagName, TagValue\r\n| order by TagCount desc",
               "size": 0,
               "title": "Azure Tag Usage",
               "noDataMessage": "No tags have been detected. Please consider implementing tags for easier organisation of your resources and billing purposes.",
@@ -420,27 +433,35 @@
               "gridSettings": {
                 "formatters": [
                   {
-                    "columnMatch": "tags",
-                    "formatter": 1,
+                    "columnMatch": "$gen_group",
+                    "formatter": 15,
                     "formatOptions": {
-                      "customColumnWidthSetting": "50%"
+                      "linkTarget": "Resource",
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "TagCount",
+                    "formatter": 3,
+                    "formatOptions": {
+                      "palette": "blue"
                     }
                   }
                 ],
                 "filter": true,
-                "labelSettings": [
-                  {
-                    "columnId": "tags",
-                    "label": "Tags"
-                  },
-                  {
-                    "columnId": "Events",
-                    "label": "Times assigned"
-                  }
-                ]
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "subscriptionId"
+                  ],
+                  "expandTopLevel": true
+                }
               }
             },
-            "customWidth": "45",
             "name": "tags",
             "styleSettings": {
               "padding": "1px"
@@ -453,47 +474,6 @@
             },
             "customWidth": "10",
             "name": "spacer"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"/subscriptions/{Subscription:id}/providers/Microsoft.Authorization/locks?api-version=2016-09-01\",\"urlParams\":[],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.value\",\"columns\":[{\"path\":\"id\",\"columnid\":\"id\"},{\"path\":\"name\",\"columnid\":\"Name\"},{\"path\":\"properties.level\",\"columnid\":\"Level\"},{\"path\":\"properties.notes\",\"columnid\":\"Notes\"},{\"path\":\"type\",\"columnid\":\"type\"}]}}]}",
-              "size": 0,
-              "title": "Resource Lock Use",
-              "noDataMessage": "No resource locks detected.",
-              "showExportToExcel": true,
-              "queryType": 12,
-              "gridSettings": {
-                "formatters": [
-                  {
-                    "columnMatch": "id",
-                    "formatter": 0,
-                    "formatOptions": {
-                      "customColumnWidthSetting": "50%"
-                    }
-                  },
-                  {
-                    "columnMatch": "Name",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "Notes",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "type",
-                    "formatter": 5
-                  }
-                ],
-                "filter": true
-              }
-            },
-            "customWidth": "45",
-            "name": "locks",
-            "styleSettings": {
-              "padding": "1px"
-            }
           },
           {
             "type": 3,
@@ -557,165 +537,22 @@
               }
             },
             "name": "policyassignments"
-          },
-          {
-            "type": 1,
-            "content": {
-              "json": "## Monitoring resources"
-            },
-            "name": "text - 8"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type contains \"microsoft.operationalinsights\"\r\n| extend sku = properties.sku.name,\r\n\tcreatedDate = properties.createdDate,\r\n\tdataIngestionStatus = properties.workspaceCapping.dataIngestionStatus,\r\n\tdailyQuotaGb = tostring(properties.workspaceCapping.dailyQuotaGb),\r\n\tretentionInDays = properties.retentionInDays\r\n| extend sku = case(sku == \"pergb2018\", \"Per GB PAYG\", sku == \"standalone\", \"Legacy PAYG\", sku)\r\n| extend dailyQuotaGb = iff(dailyQuotaGb == \"-1.0\", \"No limit\", dailyQuotaGb)\r\n| project id, name, location, resourceGroup, sku, createdDate, dataIngestionStatus, dailyQuotaGb, retentionInDays",
-              "size": 0,
-              "title": "Log Analytics workspaces",
-              "noDataMessage": "No Log Analytics workspaces detected in the selected subscription. If you have created your monitoring resources in another subscription, select that subscription in the subscription picker to view the details. If you have not created any workspaces, and want to leverage off the capabilities of Azure Monitor, please read the guidance here: https://docs.microsoft.com/en-us/azure/azure-monitor/platform/design-logs-deployment",
-              "noDataMessageStyle": 2,
-              "showExportToExcel": true,
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "{Subscription}"
-              ],
-              "gridSettings": {
-                "formatters": [
-                  {
-                    "columnMatch": "name",
-                    "formatter": 5
-                  },
-                  {
-                    "columnMatch": "location",
-                    "formatter": 17
-                  },
-                  {
-                    "columnMatch": "resourceGroup",
-                    "formatter": 14,
-                    "formatOptions": {
-                      "linkTarget": null,
-                      "showIcon": true
-                    }
-                  },
-                  {
-                    "columnMatch": "sku",
-                    "formatter": 1
-                  },
-                  {
-                    "columnMatch": "createdDate",
-                    "formatter": 6,
-                    "dateFormat": {
-                      "formatName": "longDatePattern"
-                    }
-                  },
-                  {
-                    "columnMatch": "dataIngestionStatus",
-                    "formatter": 1
-                  },
-                  {
-                    "columnMatch": "retentionInDays",
-                    "formatter": 1
-                  }
-                ],
-                "labelSettings": [
-                  {
-                    "columnId": "id",
-                    "label": "Workspace"
-                  },
-                  {
-                    "columnId": "name"
-                  },
-                  {
-                    "columnId": "location",
-                    "label": "Location"
-                  },
-                  {
-                    "columnId": "resourceGroup",
-                    "label": "Resource Group"
-                  },
-                  {
-                    "columnId": "sku",
-                    "label": "Licensing Model"
-                  },
-                  {
-                    "columnId": "createdDate",
-                    "label": "Created Date"
-                  },
-                  {
-                    "columnId": "dataIngestionStatus",
-                    "label": "Ingestion Status"
-                  },
-                  {
-                    "columnId": "dailyQuotaGb",
-                    "label": "Daily Ingestion Limit"
-                  },
-                  {
-                    "columnId": "retentionInDays",
-                    "label": "Retention in Days"
-                  }
-                ]
-              }
-            },
-            "name": "lawspaces"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type contains \"microsoft.insights\"\r\n| summarize Count = count() by type, resourceGroup\r\n| sort by type asc, Count desc, resourceGroup asc",
-              "size": 0,
-              "title": "Monitoring components created",
-              "noDataMessage": "No Monitoring resources detected in the selected subscription. If you have created your monitoring resources in another subscription, select that subscription in the subscription picker to view the details. If you have not created any workspaces, and want to leverage off the capabilities of Azure Monitor, please read the guidance here: https://docs.microsoft.com/en-us/azure/azure-monitor/overview",
-              "noDataMessageStyle": 2,
-              "showExportToExcel": true,
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "{Subscription}"
-              ],
-              "gridSettings": {
-                "formatters": [
-                  {
-                    "columnMatch": "type",
-                    "formatter": 16,
-                    "formatOptions": {
-                      "showIcon": true
-                    }
-                  },
-                  {
-                    "columnMatch": "resourceGroup",
-                    "formatter": 14,
-                    "formatOptions": {
-                      "linkTarget": null,
-                      "showIcon": true
-                    }
-                  },
-                  {
-                    "columnMatch": "Count",
-                    "formatter": 3,
-                    "formatOptions": {
-                      "palette": "blue"
-                    }
-                  }
-                ],
-                "labelSettings": [
-                  {
-                    "columnId": "type",
-                    "label": "Resource Type"
-                  },
-                  {
-                    "columnId": "resourceGroup",
-                    "label": "Resource Group"
-                  },
-                  {
-                    "columnId": "Count"
-                  }
-                ]
-              }
-            },
-            "name": "azmonresources"
-          },
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "Governance"
+      },
+      "name": "GovernanceGroup"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
           {
             "type": 1,
             "content": {
@@ -727,7 +564,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "securityresources\r\n| where type == \"microsoft.security/securescores\"\r\n| extend subScorePercentage = todouble(properties.score.current)/todouble(properties.score.max)\r\n| extend subScorePercentageXsubWeight = todouble(subScorePercentage)*todouble(properties.weight)\r\n| summarize upperValue = sum(subScorePercentageXsubWeight), underValue = sum(todouble(properties.weight))\r\n| extend overallScore = round(100*((upperValue)/(underValue)))",
+              "query": "securityresources\r\n| where type == \"microsoft.security/securescores\"\r\n| extend subScorePercentage = todouble(properties.score.current)/todouble(properties.score.max)\r\n| extend subScorePercentageXsubWeight = todouble(subScorePercentage)*todouble(properties.weight)\r\n| summarize upperValue = sum(subScorePercentageXsubWeight), underValue = sum(todouble(properties.weight)) by subscriptionId\r\n| extend overallScore = round(100*((upperValue)/(underValue)))",
               "size": 1,
               "title": "Azure Security Center Secure Score",
               "queryType": 1,
@@ -744,20 +581,28 @@
                   "formatOptions": {
                     "min": 0,
                     "max": 100,
-                    "palette": "greenRed"
+                    "palette": "redGreen"
                   },
                   "numberFormat": {
                     "unit": 1,
                     "options": {
-                      "style": "decimal"
+                      "style": "decimal",
+                      "useGrouping": false
                     }
+                  }
+                },
+                "secondaryContent": {
+                  "columnMatch": "subscriptionId",
+                  "formatter": 15,
+                  "formatOptions": {
+                    "linkTarget": null,
+                    "showIcon": true
                   }
                 },
                 "showBorder": false
               }
             },
-            "customWidth": "50",
-            "name": "asc-sscore"
+            "name": "securescoreaggregate"
           },
           {
             "type": 3,
@@ -766,6 +611,7 @@
               "query": "securityresources \r\n| where type == \"microsoft.security/pricings\"\r\n| extend tier = trim(' ',tostring(properties.pricingTier))\r\n| project name,tier,subscriptionId",
               "size": 0,
               "title": "Azure Security Center/Azure Defender",
+              "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
@@ -813,6 +659,7 @@
                     "formatter": 5
                   }
                 ],
+                "filter": true,
                 "hierarchySettings": {
                   "treeType": 1,
                   "groupBy": [
@@ -822,17 +669,245 @@
                 }
               }
             },
-            "customWidth": "50",
-            "name": "ascpricingtier"
+            "name": "ascenablement"
           }
         ]
       },
       "conditionalVisibility": {
         "parameterName": "selectedTab",
         "comparison": "isEqualTo",
-        "value": "Governance"
+        "value": "Security"
       },
-      "name": "GovernanceGroup"
+      "name": "SecurityGroup"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Monitoring resources"
+            },
+            "name": "text - 8"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type contains \"microsoft.operationalinsights\"\r\n| extend sku = properties.sku.name,\r\n\tcreatedDate = properties.createdDate,\r\n\tdataIngestionStatus = properties.workspaceCapping.dataIngestionStatus,\r\n\tdailyQuotaGb = tostring(properties.workspaceCapping.dailyQuotaGb),\r\n\tretentionInDays = properties.retentionInDays\r\n| extend sku = case(sku == \"pergb2018\", \"Per GB PAYG\", sku == \"standalone\", \"Legacy PAYG\", sku)\r\n| extend dailyQuotaGb = iff(dailyQuotaGb == \"-1.0\", \"No limit\", dailyQuotaGb)\r\n| project id, subscriptionId, name, location, resourceGroup, sku, createdDate, dataIngestionStatus, dailyQuotaGb, retentionInDays",
+              "size": 0,
+              "title": "Log Analytics workspaces",
+              "noDataMessage": "No Log Analytics workspaces detected in the selected subscription. If you have created your monitoring resources in another subscription, select that subscription in the subscription picker to view the details. If you have not created any workspaces, and want to leverage off the capabilities of Azure Monitor, please read the guidance here: https://docs.microsoft.com/en-us/azure/azure-monitor/platform/design-logs-deployment",
+              "noDataMessageStyle": 2,
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "$gen_group",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "name",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "location",
+                    "formatter": 17
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 14,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "sku",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Legacy",
+                          "representation": "Important",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "Blank",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "createdDate",
+                    "formatter": 6,
+                    "dateFormat": {
+                      "formatName": "longDatePattern"
+                    }
+                  },
+                  {
+                    "columnMatch": "dataIngestionStatus",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "retentionInDays",
+                    "formatter": 1
+                  }
+                ],
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "subscriptionId"
+                  ],
+                  "expandTopLevel": true
+                },
+                "labelSettings": [
+                  {
+                    "columnId": "id",
+                    "label": "Workspace"
+                  },
+                  {
+                    "columnId": "name"
+                  },
+                  {
+                    "columnId": "location",
+                    "label": "Location"
+                  },
+                  {
+                    "columnId": "resourceGroup",
+                    "label": "Resource Group"
+                  },
+                  {
+                    "columnId": "sku",
+                    "label": "Licensing Model"
+                  },
+                  {
+                    "columnId": "createdDate",
+                    "label": "Created Date"
+                  },
+                  {
+                    "columnId": "dataIngestionStatus",
+                    "label": "Ingestion Status"
+                  },
+                  {
+                    "columnId": "dailyQuotaGb",
+                    "label": "Daily Ingestion Limit"
+                  },
+                  {
+                    "columnId": "retentionInDays",
+                    "label": "Retention in Days"
+                  }
+                ]
+              }
+            },
+            "name": "lawspaces"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\r\n| where type contains \"microsoft.insights\"\r\n| summarize Count = count() by subscriptionId, type, resourceGroup\r\n| sort by type asc, Count desc, resourceGroup asc",
+              "size": 0,
+              "title": "Monitoring components created",
+              "noDataMessage": "No Monitoring resources detected in the selected subscription. If you have created your monitoring resources in another subscription, select that subscription in the subscription picker to view the details. If you have not created any workspaces, and want to leverage off the capabilities of Azure Monitor, please read the guidance here: https://docs.microsoft.com/en-us/azure/azure-monitor/overview",
+              "noDataMessageStyle": 2,
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "$gen_group",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "type",
+                    "formatter": 16,
+                    "formatOptions": {
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "resourceGroup",
+                    "formatter": 14,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "Count",
+                    "formatter": 3,
+                    "formatOptions": {
+                      "palette": "blue"
+                    }
+                  }
+                ],
+                "filter": true,
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "subscriptionId"
+                  ],
+                  "expandTopLevel": true
+                },
+                "labelSettings": [
+                  {
+                    "columnId": "type",
+                    "label": "Resource Type"
+                  },
+                  {
+                    "columnId": "resourceGroup",
+                    "label": "Resource Group"
+                  },
+                  {
+                    "columnId": "Count"
+                  }
+                ]
+              }
+            },
+            "name": "azmonresources"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "Monitoring"
+      },
+      "name": "MonitoringGroup"
     },
     {
       "type": 12,
@@ -1130,6 +1205,7 @@
               "title": "VMs with Public Ips directly assigned",
               "noDataMessage": "No VMs with DIrectly assigned Public Ips - good work!!!",
               "noDataMessageStyle": 3,
+              "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
@@ -1150,6 +1226,7 @@
                     "formatter": 1
                   }
                 ],
+                "filter": true,
                 "labelSettings": [
                   {
                     "columnId": "vmId",
@@ -1179,6 +1256,7 @@
               "size": 0,
               "title": "Vms with Unmanaged Disk",
               "noDataMessage": "We found no VMs using unmanaged disks",
+              "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
@@ -1223,6 +1301,7 @@
                     "formatter": 1
                   }
                 ],
+                "filter": true,
                 "labelSettings": [
                   {
                     "columnId": "id",
@@ -1270,19 +1349,16 @@
           {
             "type": 1,
             "content": {
-              "json": "## Azure Storage"
+              "json": "# Identity and RBAC"
             },
-            "name": "text - 1"
+            "name": "text - 0"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "Resources \r\n| where type =~ 'microsoft.storage/storageaccounts' | where properties['supportsHttpsTrafficOnly'] == 'false'\r\n|project name, id, type, kind, location, resourceGroup, sku.name",
-              "size": 0,
-              "title": "Secure Transfer Only Disabled",
-              "noDataMessage": "Good job!! No insecure storage accounts",
-              "noDataMessageStyle": 3,
+              "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend displayName = tostring(properties.displayName), \r\n\tcategory = properties.metadata.categories,\r\n\t\tstatus = tostring(properties.status.code)\r\n| where category contains \"IdentityAndAccess\"\r\n| distinct subscriptionId, displayName, status\r\n| order by displayName asc",
+              "size": 3,
               "showExportToExcel": true,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
@@ -1292,53 +1368,13 @@
               "gridSettings": {
                 "formatters": [
                   {
-                    "columnMatch": "id",
-                    "formatter": 13,
+                    "columnMatch": "$gen_group",
+                    "formatter": 15,
                     "formatOptions": {
-                      "linkTarget": "Resource",
+                      "linkTarget": null,
                       "showIcon": true
                     }
-                  }
-                ]
-              }
-            },
-            "name": "nonHTTPSStorageAccounts"
-          }
-        ]
-      },
-      "conditionalVisibility": {
-        "parameterName": "selectedTab",
-        "comparison": "isEqualTo",
-        "value": "Storage"
-      },
-      "name": "Storage Group"
-    },
-    {
-      "type": 12,
-      "content": {
-        "version": "NotebookGroup/1.0",
-        "groupType": "editable",
-        "items": [
-          {
-            "type": 1,
-            "content": {
-              "json": "# Identity and RBAC"
-            },
-            "name": "text - 0"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend displayName = tostring(properties.displayName), \r\n\tcategory = properties.metadata.categories,\r\n\t\tstatus = tostring(properties.status.code)\r\n| where category contains \"IdentityAndAccess\"\r\n| distinct displayName, status\r\n| order by displayName asc",
-              "size": 3,
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "{Subscription}"
-              ],
-              "gridSettings": {
-                "formatters": [
+                  },
                   {
                     "columnMatch": "displayName",
                     "formatter": 1,
@@ -1380,13 +1416,25 @@
                     }
                   },
                   {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 5
+                  },
+                  {
                     "columnMatch": "category",
                     "formatter": 5
                   }
-                ]
+                ],
+                "filter": true,
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "subscriptionId"
+                  ],
+                  "expandTopLevel": true
+                }
               }
             },
-            "name": "query - 1"
+            "name": "asc-identity-recommendations"
           }
         ]
       },
@@ -1396,6 +1444,63 @@
         "value": "Identity"
       },
       "name": "Identitygroup"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## Azure Storage"
+            },
+            "name": "text - 1"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources \r\n| where type =~ 'microsoft.storage/storageaccounts' | where properties['supportsHttpsTrafficOnly'] == 'false'\r\n|project name, id, type, kind, location, resourceGroup, sku.name",
+              "size": 0,
+              "title": "Secure Transfer Only Disabled",
+              "noDataMessage": "Good job!! No insecure storage accounts",
+              "noDataMessageStyle": 3,
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "name",
+                    "formatter": 5
+                  },
+                  {
+                    "columnMatch": "id",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "showIcon": true
+                    }
+                  }
+                ],
+                "filter": true
+              }
+            },
+            "name": "nonHTTPSStorageAccounts"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "Storage"
+      },
+      "name": "Storage Group"
     }
   ],
   "fallbackResourceIds": [

@@ -1,10 +1,10 @@
 #example 
 #$rgName = "lztest1"
-$rgName = "lztest3"
+$rgName = ""
 
 #example 
 #$resourceName = "Landing Zone Workbook Workbook resource"
-$resourceName = "Landing Zone Workbook Workbook resource 1"
+$resourceName = ""
 
 #example = "https://raw.githubusercontent.com/fskelly/lzreview/main/LZReview/landingzonereview-workbookGalleryTemplatev2.json"
 $templateURI = "https://raw.githubusercontent.com/vanessabruwer/lzreview/main/LZReview/landingzonereview-workbookGalleryTemplatev2.json"

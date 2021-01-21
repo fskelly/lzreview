@@ -20,14 +20,14 @@
             "properties": {
                 "galleries": [
                     {
-                        "name": "Azure Landing Zone Review",
-                        "category": "Landing Zone Review",
+                        "name": "A Workbook Template",
+                        "category": "Deployed Templates",
                         "order": 100,
                         "type": "workbook",
                         "resourceType": "Azure Monitor"
                     }
                 ],
-                "templateData": {
+                "templateData":{
   "version": "Notebook/1.0",
   "items": [
     {
@@ -1378,7 +1378,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend displayName = tostring(properties.displayName), \r\n\tcategory = properties.metadata.categories,\r\n\t\tstatus = tostring(properties.status.code)\r\n| where category contains \"IdentityAndAccess\"\r\n| distinct subscriptionId, displayName, status\r\n| order by displayName asc",
+              "query": "securityresources\r\n| where type == \"microsoft.security/assessments\"\r\n| extend displayName = tostring(properties.displayName), \r\n    category = properties.metadata.categories,\r\n        status = tostring(properties.status.code),\r\n        link = tostring(properties.links.azurePortal)\r\n| where category contains \"IdentityAndAccess\"\r\n| distinct subscriptionId, displayName, status, strcat(\"https://\", link)\r\n| order by displayName asc",
               "size": 3,
               "showExportToExcel": true,
               "queryType": 1,
@@ -1395,6 +1395,10 @@
                       "linkTarget": null,
                       "showIcon": true
                     }
+                  },
+                  {
+                    "columnMatch": "subscriptionId",
+                    "formatter": 5
                   },
                   {
                     "columnMatch": "displayName",
@@ -1437,8 +1441,11 @@
                     }
                   },
                   {
-                    "columnMatch": "subscriptionId",
-                    "formatter": 5
+                    "columnMatch": "Column1",
+                    "formatter": 7,
+                    "formatOptions": {
+                      "linkTarget": "Url"
+                    }
                   },
                   {
                     "columnMatch": "category",
@@ -1452,7 +1459,22 @@
                     "subscriptionId"
                   ],
                   "expandTopLevel": true
-                }
+                },
+                "labelSettings": [
+                  {
+                    "columnId": "subscriptionId"
+                  },
+                  {
+                    "columnId": "displayName"
+                  },
+                  {
+                    "columnId": "status"
+                  },
+                  {
+                    "columnId": "Column1",
+                    "label": "Recommendation URL"
+                  }
+                ]
               }
             },
             "name": "asc-identity-recommendations"
@@ -1527,9 +1549,11 @@
   "fallbackResourceIds": [
     "Azure Monitor"
   ],
+  "fromTemplateId": "ArmTemplates-/subscriptions/949ef534-07f5-4138-8b79-aae16a71310c/resourceGroups/lztest3/providers/microsoft.insights/workbooktemplates/Landing Zone Workbook Workbook resource 1",
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
             }
         }
     ]
 }
+

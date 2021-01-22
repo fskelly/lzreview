@@ -7,7 +7,7 @@ $rgName = ""
 $resourceName = ""
 
 #example = "https://raw.githubusercontent.com/fskelly/lzreview/main/LZReview/landingzonereview-workbookGalleryTemplatev2.json"
-$templateURI = "https://raw.githubusercontent.com/vanessabruwer/lzreview/main/LZReview/landingzonereview-workbookGalleryTemplatev2.json"
+$templateURI = "https://raw.githubusercontent.com/vanessabruwer/lzreview/main/LZReview/landingzonereview-workbookGalleryTemplatev2.1.json"
 
 #check to see if Resource Group exists
 $rgExist = Get-AzResourceGroup -Name $RgName -ErrorAction SilentlyContinue

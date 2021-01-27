@@ -1322,6 +1322,53 @@
               }
             },
             "name": "Vms with Unmanaged Disk"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\r\n| where type =~ 'microsoft.compute/virtualmachines'\r\n| where properties['licenseType'] == \"Windows_Server\"\r\n| extend hwProfile = todynamic(properties.hardwareProfile)\r\n| extend storageProfile = todynamic(properties.storageProfile)\r\n| project name, location, resourceGroup, VMSize = hwProfile.vmSize, Provider = storageProfile.imageReference.offer, SKU = storageProfile.imageReference.sku, id",
+              "size": 0,
+              "title": "Windows Server with AHUB applied",
+              "noDataMessage": "No Azure Hybrid Use Benefits are being applied",
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "/subscriptions/949ef534-07f5-4138-8b79-aae16a71310c"
+              ]
+            },
+            "name": "Windows Server with AHUB applied"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\r\n|\twhere type =~ 'microsoft.compute/virtualmachines'\r\n|\twhere properties['licenseType'] == \"Windows_Server\"\r\n|   extend hwProfile = todynamic(properties.hardwareProfile)\r\n|   project name, location, resourceGroup, VMSize = hwProfile.vmSize\r\n| \tsummarize count()",
+              "size": 1,
+              "title": "Windows Server with AHUB applied count",
+              "noDataMessage": "No Azure Hybrid Use Benefits are being applied",
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "/subscriptions/949ef534-07f5-4138-8b79-aae16a71310c"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {},
+                "leftContent": {
+                  "columnMatch": "count_",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "blue"
+                  }
+                },
+                "showBorder": false,
+                "size": "auto"
+              }
+            },
+            "name": "Windows Server with AHUB applied count"
           }
         ]
       },
